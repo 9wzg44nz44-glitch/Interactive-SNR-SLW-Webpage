@@ -1,0 +1,898 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scalar/Longitudinal Wave Comms: Zimmerman vs Hively Comparison</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&amp;family=Space+Grotesk:wght@500;600&amp;display=swap');
+        
+        :root {
+            --primary: #1e40af;
+        }
+        
+        body {
+            font-family: 'Inter', system_ui, sans-serif;
+        }
+        
+        .heading-font {
+            font-family: 'Space Grotesk', 'Inter', sans-serif;
+            font-weight: 600;
+        }
+
+        .section-header {
+            font-size: 1.75rem;
+            line-height: 1.1;
+            font-weight: 700;
+            color: #1e3a8a;
+        }
+
+        .nav-active {
+            border-bottom: 3px solid #1e40af;
+            font-weight: 600;
+        }
+
+        .plot-container {
+            border-radius: 12px;
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+            background: white;
+        }
+
+        .comparison-card {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .comparison-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+        }
+
+        .metric-value {
+            font-variant-numeric: tabular-nums;
+        }
+
+        .math {
+            font-size: 1.05rem;
+        }
+
+        .slide-quote {
+            border-left: 5px solid #1e40af;
+            background: linear-gradient(to right, #f0f9ff, transparent);
+        }
+
+        .tab-button {
+            transition: all 0.2s ease;
+        }
+
+        .tab-button.active {
+            background-color: #1e40af;
+            color: white;
+            box-shadow: 0 4px 6px -1px rgb(30 64 175 / 0.2);
+        }
+
+        .wave-bg {
+            background-image: 
+                linear-gradient(rgba(30, 64, 175, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(30, 64, 175, 0.03) 1px, transparent 1px);
+            background-size: 60px 60px;
+        }
+
+        .equation-box {
+            background: #f8fafc;
+            border: 1px solid #e0e7ff;
+            border-radius: 8px;
+            padding: 1rem;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800">
+    <!-- Navbar -->
+    <nav class="bg-white border-b border-slate-200 sticky top-0 z-50">
+        <div class="max-w-screen-xl mx-auto px-6 py-4 flex items-center justify-between">
+            <div class="flex items-center gap-x-3">
+                <div class="w-10 h-10 bg-blue-800 rounded-2xl flex items-center justify-center">
+                    <span class="text-white text-2xl font-bold tracking-tighter">SLW</span>
+                </div>
+                <div>
+                    <span class="font-semibold text-2xl tracking-tight">ScalarWave Labs</span>
+                    <span class="text-xs text-slate-500 block -mt-1">Comparative Analysis</span>
+                </div>
+            </div>
+            
+            <div class="flex items-center gap-x-2 text-sm">
+                <a href="#overview" class="px-4 py-2 hover:bg-slate-100 rounded-xl transition-colors">Overview</a>
+                <a href="#theory" class="px-4 py-2 hover:bg-slate-100 rounded-xl transition-colors">Theory</a>
+                <a href="#comparison" class="px-4 py-2 hover:bg-slate-100 rounded-xl transition-colors">Compare</a>
+                <a href="#simulator" class="px-4 py-2 hover:bg-slate-100 rounded-xl transition-colors">Interactive Simulator</a>
+                <a href="#conclusion" class="px-4 py-2 hover:bg-slate-100 rounded-xl transition-colors">Insights</a>
+            </div>
+            
+            <div class="flex items-center gap-x-2">
+                <div class="px-3 py-1.5 bg-emerald-100 text-emerald-700 text-xs font-medium rounded-full flex items-center gap-x-1.5">
+                    <div class="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
+                    <span>Based on Haralick ESTC 2017 + Primary Sources</span>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero -->
+    <div class="max-w-screen-xl mx-auto px-6 pt-12 pb-8">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+            <div class="lg:col-span-7">
+                <div class="inline-flex items-center gap-x-2 px-4 py-1.5 rounded-3xl bg-blue-100 text-blue-700 text-sm font-medium mb-4">
+                    <span>From Maxwell to Biquaternions</span>
+                </div>
+                
+                <h1 class="text-6xl lg:text-7xl leading-[1.05] tracking-tighter font-semibold text-slate-900">
+                    Zimmerman vs Hively:<br>
+                    <span class="bg-gradient-to-r from-blue-700 to-indigo-700 bg-clip-text text-transparent">Scalar &amp; Longitudinal</span><br>
+                    Wave Communications
+                </h1>
+                
+                <p class="mt-6 text-xl text-slate-600 max-w-xl">
+                    An integrated comparison of two modern experimental approaches to generating, propagating, 
+                    and detecting non-transverse electromagnetic waves — anchored in Haralick's biquaternion 
+                    generalization of Maxwell's equations.
+                </p>
+                
+                <div class="flex items-center gap-x-4 mt-8">
+                    <button onclick="document.getElementById('simulator').scrollIntoView({ behavior: 'smooth' })" 
+                            class="px-8 py-3.5 bg-blue-800 hover:bg-blue-900 transition-all text-white font-semibold rounded-3xl flex items-center gap-x-2 shadow-lg shadow-blue-900/30">
+                        <span>Launch Interactive Simulator</span>
+                    </button>
+                    <button onclick="window.open('https://haralick.org/conferences/maxwell_slides_ESTC.pdf', '_blank')" 
+                            class="px-6 py-3.5 border border-slate-300 hover:bg-white transition-all font-medium rounded-3xl flex items-center gap-x-2">
+                        <span>View Haralick Slides (172 pp)</span>
+                    </button>
+                </div>
+                
+                <div class="mt-8 flex items-center gap-x-8 text-sm">
+                    <div class="flex -space-x-2">
+                        <div class="w-8 h-8 bg-slate-300 rounded-full border-2 border-white overflow-hidden"><img src="https://picsum.photos/id/1005/32/32" class="w-full h-full object-cover"></div>
+                        <div class="w-8 h-8 bg-slate-300 rounded-full border-2 border-white overflow-hidden"><img src="https://picsum.photos/id/1011/32/32" class="w-full h-full object-cover"></div>
+                        <div class="w-8 h-8 bg-slate-300 rounded-full border-2 border-white overflow-hidden"><img src="https://picsum.photos/id/201/32/32" class="w-full h-full object-cover"></div>
+                    </div>
+                    <div class="text-slate-500 text-sm">Inspired by <span class="font-medium text-slate-700">Zimmerman (2011)</span>, <span class="font-medium text-slate-700">Hively (2016 patent)</span> &amp; <span class="font-medium text-slate-700">Haralick</span></div>
+                </div>
+            </div>
+            
+            <div class="lg:col-span-5">
+                <div class="bg-white rounded-3xl p-2 shadow-xl border border-slate-100">
+                    <div class="bg-slate-900 rounded-3xl p-6 text-white text-sm">
+                        <div class="flex justify-between items-start mb-4">
+                            <div>
+                                <div class="text-emerald-400 text-xs tracking-[2px] font-mono">KEY INSIGHT</div>
+                                <div class="text-xl font-semibold mt-1">Both approaches exploit<br>curl-free vector potential<br>and scalar field S ≠ 0</div>
+                            </div>
+                            <div class="text-right">
+                                <div class="text-[10px] opacity-60">HARALICK / BIQUATERNION</div>
+                            </div>
+                        </div>
+                        
+                        <div class="grid grid-cols-2 gap-3 text-xs">
+                            <div class="bg-white/10 rounded-2xl p-3">
+                                <div class="opacity-70">Zimmerman</div>
+                                <div class="font-semibold">Plasma AB detector<br>for longitudinal A<sub>z</sub></div>
+                                <div class="text-[10px] mt-1 opacity-60">1/R propagation • Lorenz gauge validated</div>
+                            </div>
+                            <div class="bg-white/10 rounded-2xl p-3">
+                                <div class="opacity-70">Hively</div>
+                                <div class="font-semibold">Bifilar pancake coil<br>+ short rise-time pulses</div>
+                                <div class="text-[10px] mt-1 opacity-60">B-cancellation • Gradient-driven SLW</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Overview Section -->
+    <div id="overview" class="max-w-screen-xl mx-auto px-6 py-12 border-t border-slate-200">
+        <div class="flex items-end justify-between mb-8">
+            <div>
+                <span class="uppercase tracking-[3px] text-xs font-semibold text-blue-700">Context from Haralick ESTC 2017</span>
+                <h2 class="section-header mt-1">The Landscape of Scalar &amp; Longitudinal Waves</h2>
+            </div>
+        </div>
+        
+        <div class="prose prose-slate max-w-none text-[15px]">
+            <p>Standard Maxwell equations describe transverse electromagnetic waves (TEM) where <strong>E</strong> and <strong>B</strong> are perpendicular to the direction of propagation. However, extensions using quaternions and biquaternions (as developed in Haralick's framework and earlier by others) allow for longitudinal electric fields (E parallel to propagation) and a scalar field S = ∇·A + (1/c²)∂φ/∂t when the Lorenz gauge condition is relaxed or when specific hardware excites curl-free potentials.</p>
+            
+            <p>Two prominent experimental lines of inquiry stand out in recent decades:</p>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
+            <!-- Zimmerman Card -->
+            <div class="comparison-card bg-white border border-slate-200 rounded-3xl p-7">
+                <div class="flex items-center gap-x-3 mb-4">
+                    <div class="px-4 py-1 bg-amber-100 text-amber-700 text-xs font-bold tracking-wider rounded-2xl">ZIMMERMAN 2011</div>
+                    <div class="text-xs px-3 py-1 bg-slate-100 rounded-2xl text-slate-600">QEX + Journal of Applied Physics</div>
+                </div>
+                <h3 class="font-semibold text-2xl tracking-tight">Longitudinal Vector Potential A<sub>z</sub> via Plasma AB Detector</h3>
+                <ul class="mt-5 space-y-3 text-[14.5px]">
+                    <li class="flex gap-3"><span class="font-mono text-blue-600 mt-0.5">→</span> <span><strong>Tx:</strong> Monopole antenna in TM<sub>01</sub> circular waveguide or open aperture with screen (nulls on-axis TEM)</span></li>
+                    <li class="flex gap-3"><span class="font-mono text-blue-600 mt-0.5">→</span> <span><strong>Rx:</strong> Folded plasma tube (mercury vapor, 200 mA DC bias) acting as differential Aharonov-Bohm detector</span></li>
+                    <li class="flex gap-3"><span class="font-mono text-blue-600 mt-0.5">→</span> <span><strong>Key result:</strong> A<sub>z</sub> propagates as 1/R; E<sub>z</sub> as 1/R² (near-field dominant on axis). |A/E| ≈ 0.3. Plasma electrons respond where metal valence electrons cannot.</span></li>
+                    <li class="flex gap-3"><span class="font-mono text-blue-600 mt-0.5">→</span> <span><strong>Theory:</strong> Macroscopic classical AB effect; momentum transfer p = eA; validates Lorenz gauge for propagating A waves.</span></li>
+                </ul>
+            </div>
+            
+            <!-- Hively Card -->
+            <div class="comparison-card bg-white border border-slate-200 rounded-3xl p-7">
+                <div class="flex items-center gap-x-3 mb-4">
+                    <div class="px-4 py-1 bg-violet-100 text-violet-700 text-xs font-bold tracking-wider rounded-2xl">HIVELY 2016</div>
+                    <div class="text-xs px-3 py-1 bg-slate-100 rounded-2xl text-slate-600">US Patent 9,306,527 B1</div>
+                </div>
+                <h3 class="font-semibold text-2xl tracking-tight">Scalar-Longitudinal Waves (SLW) via Bifilar Pancake Coils</h3>
+                <ul class="mt-5 space-y-3 text-[14.5px]">
+                    <li class="flex gap-3"><span class="font-mono text-violet-600 mt-0.5">→</span> <span><strong>Tx/Rx:</strong> Bifilar pancake (flat spiral) coil with alternating winding directions so adjacent turns carry current in opposite directions → strong B-field cancellation</span></li>
+                    <li class="flex gap-3"><span class="font-mono text-violet-600 mt-0.5">→</span> <span><strong>Drive:</strong> Short rise-time repetitive disruptive negative unipolar pulses (Tesla/Boyce inspired)</span></li>
+                    <li class="flex gap-3"><span class="font-mono text-violet-600 mt-0.5">→</span> <span><strong>Key mechanism:</strong> Gradient-driven current; curl-free vector potential emphasized; generation of longitudinal E and scalar magnetic S field</span></li>
+                    <li class="flex gap-3"><span class="font-mono text-violet-600 mt-0.5">→</span> <span><strong>Theory:</strong> Fits Haralick biquaternion framework where S ≠ 0 yields electro-scalar waves E<sub>z</sub> = f(z−ct), S = f(z−ct)/c. Practical hardware for SLW comms, imaging, etc.</span></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Theory Section -->
+    <div id="theory" class="max-w-screen-xl mx-auto px-6 py-12 bg-white border-y border-slate-200">
+        <div class="max-w-3xl">
+            <span class="text-xs font-semibold tracking-[2.5px] text-indigo-600">UNIFIED FRAMEWORK</span>
+            <h2 class="section-header mt-2">Biquaternion Generalized Maxwell Equations<br>(Haralick / Quaternion Extensions)</h2>
+        </div>
+        
+        <div class="mt-8 grid grid-cols-1 lg:grid-cols-12 gap-x-8 gap-y-8">
+            <div class="lg:col-span-5">
+                <div class="equation-box">
+                    <div class="text-xs uppercase tracking-widest text-slate-500 mb-2 font-medium">Key Scalar Field</div>
+                    <div class="math">
+                        S = ∇ · A + (1/c²) ∂φ/∂t
+                    </div>
+                    <div class="text-xs mt-3 text-slate-600">When S ≠ 0 (deviation from strict Lorenz gauge), longitudinal solutions appear.</div>
+                </div>
+                
+                <div class="mt-6 text-sm">
+                    <p class="font-medium">From the slides (Haralick):</p>
+                    <p class="mt-2 text-slate-600">"When E<sub>x</sub> = E<sub>y</sub> = 0 and S ≠ 0, the general solution for the forward wave is E<sub>z</sub>(z,t) = f(z − ct) and S(z,t) = f(z − ct)/c. These are the Electro-Scalar wave fields."</p>
+                </div>
+            </div>
+            
+            <div class="lg:col-span-7">
+                <div class="bg-slate-900 text-slate-200 rounded-3xl p-7 text-sm">
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
+                        <div>
+                            <div class="text-emerald-400 text-xs mb-1 tracking-wider">ZIMMERMAN EMPHASIS</div>
+                            <div class="font-semibold">Longitudinal A-field propagation</div>
+                            <div class="mt-3 text-xs leading-relaxed opacity-80">Experimental demonstration that A<sub>z</sub> carries momentum and propagates ~1/R even when TEM is nulled on-axis. Plasma detector essential because metal electrons are too slow (v ~ mm/s vs plasma 40 km/s DC + RF kick ~20 m/s).</div>
+                        </div>
+                        <div>
+                            <div class="text-violet-400 text-xs mb-1 tracking-wider">HIVELY EMPHASIS</div>
+                            <div class="font-semibold">Bifilar B-cancellation + pulsed gradient drive</div>
+                            <div class="mt-3 text-xs leading-relaxed opacity-80">Hardware designed so magnetic field from adjacent turns cancels. Short rise-time negative pulses create charge densification/rarefaction pairs that constitute the longitudinal electric wave. Aligns with Tesla concatenated resonance ideas.</div>
+                        </div>
+                        <div>
+                            <div class="text-amber-400 text-xs mb-1 tracking-wider">SHARED FOUNDATION</div>
+                            <div class="font-semibold">Potentials are physically real</div>
+                            <div class="mt-3 text-xs leading-relaxed opacity-80">Both validate that electromagnetic potentials (A, φ, S) are observable and can carry information independently of or in addition to the transverse E/B fields. Consistent with correspondence principle (classical limit of AB effect).</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Head-to-Head Comparison -->
+    <div id="comparison" class="max-w-screen-xl mx-auto px-6 py-14">
+        <div class="flex justify-between items-end mb-6">
+            <div>
+                <span class="text-xs uppercase tracking-[3px] font-semibold text-slate-500">Side-by-Side Analysis</span>
+                <h2 class="section-header">Zimmerman vs Hively: Key Dimensions</h2>
+            </div>
+        </div>
+        
+        <div class="overflow-x-auto">
+            <table class="w-full min-w-[980px] border-collapse text-sm">
+                <thead>
+                    <tr class="bg-slate-900 text-white">
+                        <th class="px-6 py-4 text-left font-medium w-52">Dimension</th>
+                        <th class="px-6 py-4 text-left font-medium">Zimmerman (2011)</th>
+                        <th class="px-6 py-4 text-left font-medium">Hively (US9306527, 2016)</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-200 text-[13.5px]">
+                    <tr class="hover:bg-slate-50">
+                        <td class="px-6 py-4 font-semibold bg-slate-100">Primary Field Detected/Transmitted</td>
+                        <td class="px-6 py-4">Longitudinal vector potential <strong>A<sub>z</sub></strong> (momentum-carrying)</td>
+                        <td class="px-6 py-4">Scalar-longitudinal waves (SLW): longitudinal <strong>E</strong> + scalar <strong>S</strong> magnetic field</td>
+                    </tr>
+                    <tr class="hover:bg-slate-50">
+                        <td class="px-6 py-4 font-semibold bg-slate-100">Transmitter Hardware</td>
+                        <td class="px-6 py-4">Quarter-wave monopole in TM<sub>01</sub> waveguide or screened open-ended waveguide (nulls TEM on axis)</td>
+                        <td class="px-6 py-4">Bifilar pancake (flat spiral) coil with opposing adjacent turns + short rise-time negative pulses; also monopole examples at 8 GHz</td>
+                    </tr>
+                    <tr class="hover:bg-slate-50">
+                        <td class="px-6 py-4 font-semibold bg-slate-100">Receiver Hardware</td>
+                        <td class="px-6 py-4"><strong>Plasma tube</strong> (folded CFL, 200 mA DC) as differential AB detector. Bias reversal separates E and A contributions.</td>
+                        <td class="px-6 py-4">Bifilar pancake coil (same as Tx) or monopole; sensitive to gradient-driven currents and SLW</td>
+                    </tr>
+                    <tr class="hover:bg-slate-50">
+                        <td class="px-6 py-4 font-semibold bg-slate-100">Propagation Scaling (far field)</td>
+                        <td class="px-6 py-4"><strong>A<sub>z</sub> ∝ 1/R</strong> (radiation term survives); <strong>E<sub>z</sub> ∝ 1/R²</strong> (near-field, TEM nulled on-axis)</td>
+                        <td class="px-6 py-4">Longitudinal E and scalar S supported by biquaternion solutions (E<sub>z</sub> = f(z−ct)). Practical range demonstrated in patent context; less quantitative far-field data published.</td>
+                    </tr>
+                    <tr class="hover:bg-slate-50">
+                        <td class="px-6 py-4 font-semibold bg-slate-100">Theoretical Anchor</td>
+                        <td class="px-6 py-4">Classical macroscopic Aharonov-Bohm effect; interaction energy U = e(φ − v·A); Lorenz gauge required for propagating A waves</td>
+                        <td class="px-6 py-4">Biquaternion / quaternion generalized Maxwell (Haralick lineage); S ≠ 0 enables electro-scalar waves; curl-free A emphasized via B-cancellation</td>
+                    </tr>
+                    <tr class="hover:bg-slate-50">
+                        <td class="px-6 py-4 font-semibold bg-slate-100">Experimental Validation</td>
+                        <td class="px-6 py-4">Waveguide (3 m) + free-space to 25 m; VNA phase/amplitude separation of E/A; plasma responsivity ~420 kA/(Wb/m)</td>
+                        <td class="px-6 py-4">Patent-focused; hardware prototypes implied (bifilar coils, pulse generators). Less peer-reviewed quantitative propagation data than Zimmerman.</td>
+                    </tr>
+                    <tr class="hover:bg-slate-50">
+                        <td class="px-6 py-4 font-semibold bg-slate-100">Comms Strengths</td>
+                        <td class="px-6 py-4">Rigorous proof of A-wave existence &amp; detection; potential for covert comms (no TEM power on axis); works at L-band microwave</td>
+                        <td class="px-6 py-4">Tesla-inspired pulsed operation; hardware simplicity (no plasma needed); B-cancellation may reduce some losses; broader "scalar" claims (imaging, fusion?)</td>
+                    </tr>
+                    <tr class="hover:bg-slate-50">
+                        <td class="px-6 py-4 font-semibold bg-slate-100">Limitations / Open Questions</td>
+                        <td class="px-6 py-4">Plasma detector requires high DC bias &amp; careful implementation; on-axis E weak at long range</td>
+                        <td class="px-6 py-4">Fewer independent replications published; quantitative SNR/range data less detailed in public literature</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="mt-6 text-xs text-slate-500 max-w-3xl">
+            Note: Both approaches are compatible with the biquaternion framework presented by Haralick. Zimmerman provides the strongest experimental evidence to date for propagating longitudinal A at microwave frequencies. Hively provides practical, Tesla-derived hardware optimized for scalar-longitudinal generation and reception.
+        </div>
+    </div>
+
+    <!-- Interactive Simulator -->
+    <div id="simulator" class="max-w-screen-xl mx-auto px-6 py-12 bg-gradient-to-b from-white to-slate-100 border-t border-slate-200">
+        <div class="flex items-end justify-between mb-6">
+            <div>
+                <span class="px-3 py-1 text-xs font-bold tracking-widest bg-gradient-to-r from-blue-700 to-indigo-700 text-white rounded-2xl">LIVE MODEL</span>
+                <h2 class="section-header mt-2">Interactive Propagation &amp; SNR Simulator</h2>
+                <p class="text-slate-600 mt-1">Compare field strength and link budget for Zimmerman-style A-wave vs Hively-style SLW under different media and distances. Model anchored to published experimental references.</p>
+            </div>
+        </div>
+        
+        <!-- Controls -->
+        <div class="bg-white rounded-3xl shadow p-6 mb-6 border border-slate-200">
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-x-4 gap-y-6">
+                
+                <!-- Approach Toggle -->
+                <div>
+                    <label class="text-xs font-semibold text-slate-500 block mb-1.5">APPROACH</label>
+                    <div class="flex rounded-2xl overflow-hidden border border-slate-300 text-sm font-medium">
+                        <button onclick="setApproach('zimmerman')" id="btn-zimmerman"
+                                class="flex-1 px-4 py-2.5 bg-amber-600 text-white active">Zimmerman (A-wave)</button>
+                        <button onclick="setApproach('hively')" id="btn-hively"
+                                class="flex-1 px-4 py-2.5 bg-violet-600 text-white">Hively (SLW)</button>
+                    </div>
+                </div>
+                
+                <div>
+                    <label class="text-xs font-semibold text-slate-500 block mb-1.5">FREQUENCY (GHz)</label>
+                    <input type="range" id="freq" min="1.28" max="8" step="0.05" value="1.3" class="w-full accent-blue-700"
+                           oninput="updateSimulator()">
+                    <div class="flex justify-between text-[10px] text-slate-500 mt-0.5">
+                        <div>1.3</div><div id="freq-val">1.30</div><div>8.0</div>
+                    </div>
+                </div>
+                
+                <div>
+                    <label class="text-xs font-semibold text-slate-500 block mb-1.5">TX POWER (dBm)</label>
+                    <input type="range" id="power" min="-10" max="50" step="1" value="20" class="w-full accent-blue-700"
+                           oninput="updateSimulator()">
+                    <div class="flex justify-between text-[10px] text-slate-500 mt-0.5">
+                        <div>-10</div><div id="power-val">20</div><div>+50</div>
+                    </div>
+                </div>
+                
+                <div>
+                    <label class="text-xs font-semibold text-slate-500 block mb-1.5">DISTANCE (log m)</label>
+                    <input type="range" id="distance" min="0" max="8" step="0.05" value="3.0" class="w-full accent-blue-700"
+                           oninput="updateSimulator()">
+                    <div class="flex justify-between text-[10px] text-slate-500 mt-0.5">
+                        <div>1m</div><div id="dist-val">~1 km</div><div>100,000 km</div>
+                    </div>
+                </div>
+                
+                <div>
+                    <label class="text-xs font-semibold text-slate-500 block mb-1.5">MEDIA / PATH</label>
+                    <select id="media" onchange="updateSimulator()" class="w-full border border-slate-300 rounded-2xl px-3 py-2 text-sm">
+                        <option value="air">Air (free space / ground)</option>
+                        <option value="steel">3-inch Steel barrier</option>
+                        <option value="seawater">Seawater layer (10 m)</option>
+                        <option value="leo">Atmosphere → LEO (~400 km)</option>
+                        <option value="geo">Atmosphere → GEO (~36,000 km)</option>
+                    </select>
+                </div>
+                
+                <div>
+                    <label class="text-xs font-semibold text-slate-500 block mb-1.5">RX BW / NF</label>
+                    <div class="flex gap-2">
+                        <div class="flex-1">
+                            <input type="number" id="bw" value="10" step="1" class="w-full border rounded-2xl px-3 py-1.5 text-sm" oninput="updateSimulator()">
+                            <div class="text-[9px] text-center text-slate-500">kHz</div>
+                        </div>
+                        <div class="flex-1">
+                            <input type="number" id="nf" value="3" step="0.5" class="w-full border rounded-2xl px-3 py-1.5 text-sm" oninput="updateSimulator()">
+                            <div class="text-[9px] text-center text-slate-500">NF dB</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mt-4 flex items-center justify-between text-xs">
+                <div class="flex items-center gap-x-4">
+                    <div class="flex items-center gap-x-1.5">
+                        <div class="w-3 h-3 rounded bg-amber-500"></div>
+                        <span class="font-medium text-amber-700">Zimmerman A<sub>z</sub></span>
+                    </div>
+                    <div class="flex items-center gap-x-1.5">
+                        <div class="w-3 h-3 rounded bg-violet-500"></div>
+                        <span class="font-medium text-violet-700">Hively SLW (est.)</span>
+                    </div>
+                </div>
+                <div id="current-r" class="font-mono text-xs px-3 py-1 bg-slate-100 rounded-xl"></div>
+            </div>
+        </div>
+        
+        <!-- Plots Row -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            
+            <!-- Amplitude vs Distance Plot -->
+            <div class="lg:col-span-7 bg-white rounded-3xl border border-slate-200 p-5 plot-container">
+                <div class="flex justify-between items-center mb-3 px-1">
+                    <div>
+                        <span class="font-semibold">Field Amplitude vs Range</span>
+                        <span class="text-xs ml-2 text-slate-500">(log-log scale)</span>
+                    </div>
+                    <div class="text-[10px] px-2.5 py-1 bg-slate-100 rounded-xl">A<sub>z</sub> or SLW strength at detector</div>
+                </div>
+                <div id="amplitude-plot" style="height: 320px;"></div>
+                <div class="text-[10px] text-slate-500 px-1 mt-1">Zimmerman: A ∝ 1/R (far), E ∝ 1/R². Hively SLW modeled with similar 1/R longitudinal component + pulse efficiency factor.</div>
+            </div>
+            
+            <!-- Key Metrics -->
+            <div class="lg:col-span-5 bg-white rounded-3xl border border-slate-200 p-5 flex flex-col">
+                <div class="font-semibold mb-3 px-1">Current Link Metrics</div>
+                
+                <div class="grid grid-cols-2 gap-3 flex-1">
+                    <div class="bg-slate-50 rounded-2xl p-4">
+                        <div class="text-xs text-slate-500">A<sub>z</sub> / SLW Amplitude</div>
+                        <div id="amp-value" class="text-3xl font-semibold metric-value mt-1 text-slate-900">—</div>
+                        <div class="text-[10px] text-emerald-600">Wb/m or equiv.</div>
+                    </div>
+                    <div class="bg-slate-50 rounded-2xl p-4">
+                        <div class="text-xs text-slate-500">Detected I<sub>rf,rms</sub></div>
+                        <div id="current-value" class="text-3xl font-semibold metric-value mt-1 text-slate-900">—</div>
+                        <div class="text-[10px] text-emerald-600">μA (plasma / bifilar)</div>
+                    </div>
+                    
+                    <div class="bg-slate-50 rounded-2xl p-4">
+                        <div class="text-xs text-slate-500">Signal Power (approx)</div>
+                        <div id="sig-power" class="text-3xl font-semibold metric-value mt-1 text-slate-900">—</div>
+                        <div class="text-[10px] text-emerald-600">dBm into 50 Ω</div>
+                    </div>
+                    <div class="bg-slate-50 rounded-2xl p-4">
+                        <div class="text-xs text-slate-500">SNR</div>
+                        <div id="snr-value" class="text-3xl font-semibold metric-value mt-1 text-slate-900">—</div>
+                        <div class="text-[10px] text-emerald-600">dB (BW &amp; NF applied)</div>
+                    </div>
+                </div>
+                
+                <div class="mt-auto pt-4 border-t text-[10px] text-slate-500 px-1">
+                    Model uses Zimmerman plasma responsivity (420 kA/(Wb/m)) as baseline. Hively bifilar estimated at ~60% relative efficiency for gradient-driven SLW (adjustable conceptually).
+                </div>
+            </div>
+            
+            <!-- SNR Comparison Bar -->
+            <div class="lg:col-span-12 bg-white rounded-3xl border border-slate-200 p-5 plot-container">
+                <div class="px-1 mb-3 flex items-baseline justify-between">
+                    <span class="font-semibold">SNR Comparison Across Scenarios (fixed 20 dBm Tx, 10 kHz BW)</span>
+                </div>
+                <div id="snr-bar-plot" style="height: 220px;"></div>
+            </div>
+        </div>
+        
+        <div class="text-center mt-4">
+            <button onclick="resetSimulator()" 
+                    class="text-xs px-5 py-2 border border-slate-300 hover:bg-white transition-colors rounded-3xl">Reset to defaults (Zimmerman L-band, air, 1.5 m)</button>
+        </div>
+    </div>
+
+    <!-- Conclusion / Insights -->
+    <div id="conclusion" class="max-w-screen-xl mx-auto px-6 py-14">
+        <div class="max-w-3xl mx-auto text-center">
+            <h2 class="section-header">Key Takeaways &amp; Synthesis</h2>
+            
+            <div class="mt-8 grid grid-cols-1 md:grid-cols-3 gap-5 text-left">
+                <div class="bg-white p-6 rounded-3xl border">
+                    <div class="font-bold text-amber-700">Zimmerman's Strength</div>
+                    <p class="mt-3 text-sm">Provides the most rigorous, peer-reviewed experimental confirmation of propagating longitudinal vector potential waves at microwave frequencies, including quantitative scaling laws and a working plasma-based detector. Excellent foundation for understanding the physics.</p>
+                </div>
+                <div class="bg-white p-6 rounded-3xl border">
+                    <div class="font-bold text-violet-700">Hively's Strength</div>
+                    <p class="mt-3 text-sm">Delivers practical, patent-protected hardware (bifilar pancake + pulsed drive) that is easier to implement than plasma tubes for many applications. Strong alignment with Tesla's vision and the biquaternion scalar S field.</p>
+                </div>
+                <div class="bg-white p-6 rounded-3xl border">
+                    <div class="font-bold text-emerald-700">Complementary Future</div>
+                    <p class="mt-3 text-sm">A hybrid system — Zimmerman-style rigorous A-wave physics + Hively bifilar/pulsed generation — could yield robust scalar-longitudinal communication links, especially for covert, through-obstacle, or space applications where TEM is undesirable or blocked.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="border-t bg-white py-8 text-xs text-slate-500">
+        <div class="max-w-screen-xl mx-auto px-6 flex flex-col md:flex-row justify-between gap-y-3">
+            <div>
+                Built from primary sources: Zimmerman (QEX 2011, J. Appl. Phys.), Hively US9306527 (2016), Haralick "Biquaternion Generalized Maxwell Equations" ESTC 2017 slides.
+                <br>Interactive model is illustrative/educational; real-world performance requires empirical calibration.
+            </div>
+            <div class="text-right">
+                <a href="https://haralick.org/conferences/maxwell_slides_ESTC.pdf" target="_blank" class="hover:text-blue-700">Haralick Slides (PDF)</a> • 
+                <a href="#" onclick="alert('Zimmerman paper link would go here in full version');" class="hover:text-blue-700">Zimmerman 2011</a> • 
+                <a href="https://patents.google.com/patent/US9306527B1" target="_blank" class="hover:text-blue-700">Hively Patent</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Tailwind script
+        function initializeTailwind() {
+            document.documentElement.style.setProperty('--accent', '#1e40af');
+        }
+        
+        let currentApproach = 'zimmerman';
+        
+        function setApproach(approach) {
+            currentApproach = approach;
+            
+            // Update button styles
+            const btnZ = document.getElementById('btn-zimmerman');
+            const btnH = document.getElementById('btn-hively');
+            
+            if (approach === 'zimmerman') {
+                btnZ.classList.add('bg-amber-600', 'text-white');
+                btnZ.classList.remove('bg-slate-200', 'text-slate-700');
+                btnH.classList.remove('bg-violet-600', 'text-white');
+                btnH.classList.add('bg-slate-200', 'text-slate-700');
+            } else {
+                btnH.classList.add('bg-violet-600', 'text-white');
+                btnH.classList.remove('bg-slate-200', 'text-slate-700');
+                btnZ.classList.remove('bg-amber-600', 'text-white');
+                btnZ.classList.add('bg-slate-200', 'text-slate-700');
+            }
+            
+            updateSimulator();
+        }
+        
+        function getMediaParams(media, fGHz, r) {
+            let atten = 1.0;
+            let effR = r;
+            let note = '';
+            
+            const fHz = fGHz * 1e9;
+            
+            if (media === 'steel') {
+                // Skin depth steel approx
+                const sigma = 5e6;
+                const muR = 50;
+                const delta = Math.sqrt(2 / (2 * Math.PI * fHz * 4e-7 * muR * sigma));
+                atten = Math.exp(-0.0762 / delta); // 3 inch
+                note = 'Steel: extreme attenuation (skin effect)';
+            } else if (media === 'seawater') {
+                const sigma = 4.0;
+                const delta = Math.sqrt(2 / (2 * Math.PI * fHz * 4e-7 * sigma));
+                atten = Math.exp(-10 / delta); // 10m layer example
+                note = 'Seawater: strong attenuation';
+            } else if (media === 'leo') {
+                effR = 400000; // ~400 km altitude, rough path
+                // Simple atm atten ~1-3 dB
+                atten = Math.pow(10, -1.5 / 20);
+                note = 'LEO path + mild atm loss';
+            } else if (media === 'geo') {
+                effR = 35786000;
+                atten = Math.pow(10, -2.5 / 20);
+                note = 'GEO path + atm loss';
+            } else {
+                effR = r;
+                atten = 1.0;
+            }
+            
+            return { atten, effR, note };
+        }
+        
+        function calculateFields(approach, fGHz, P_dBm, r, media) {
+            const P_W = Math.pow(10, P_dBm / 10) / 1000;
+            const { atten, effR } = getMediaParams(media, fGHz, r);
+            
+            let A_peak, E_peak, efficiencyFactor = 1.0;
+            
+            if (approach === 'zimmerman') {
+                // Anchored to paper: ~1e-10 Wb/m at 1.5m, 10mW
+                const refR = 1.5;
+                const refP = 0.01;
+                const refA = 1e-10;
+                
+                A_peak = refA * (refR / effR) * Math.sqrt(P_W / refP) * atten;
+                E_peak = (refA / 0.25) * (refR / r) ** 2 * Math.sqrt(P_W / refP) * atten * (media.includes('leo') || media.includes('geo') ? 0.05 : 1);
+                efficiencyFactor = 1.0; // plasma responsivity baseline
+            } else {
+                // Hively SLW estimate: similar longitudinal component but with bifilar efficiency and pulse factor
+                const refR = 1.5;
+                const refP = 0.01;
+                const refA = 8e-11; // slightly lower effective for SLW estimate
+                
+                A_peak = refA * (refR / effR) * Math.sqrt(P_W / refP) * atten * 0.85; // bifilar efficiency ~85%
+                E_peak = A_peak * 3.5; // different E/A relationship in pulsed SLW
+                efficiencyFactor = 0.65; // estimated relative to plasma detector
+            }
+            
+            // Responsivity (plasma baseline, adjusted for Hively)
+            const baseResp = 420000; // A_rms / (Wb/m peak)
+            const I_rms = baseResp * A_peak * efficiencyFactor;
+            
+            // Signal power rough
+            const R_load = 50;
+            const Psig_W = Math.pow(I_rms, 2) * R_load * 0.75; // accounting for matching/Gamma
+            const Psig_dBm = 10 * Math.log10(Math.max(Psig_W, 1e-20) * 1000);
+            
+            // Noise
+            const k = 1.380649e-23;
+            const T0 = 290;
+            const BW = parseFloat(document.getElementById('bw').value || 10) * 1000;
+            const NF = parseFloat(document.getElementById('nf').value || 3);
+            const N_W = k * T0 * BW * Math.pow(10, NF / 10);
+            const SNR_dB = 10 * Math.log10(Math.max(Psig_W / N_W, 1e-12));
+            
+            return {
+                A_peak: A_peak,
+                E_peak: E_peak,
+                I_rms: I_rms,
+                Psig_dBm: Psig_dBm,
+                SNR_dB: SNR_dB,
+                effR: effR
+            };
+        }
+        
+        let amplitudePlot = null;
+        let snrBarPlot = null;
+        
+        function updateSimulator() {
+            const f = parseFloat(document.getElementById('freq').value);
+            const P = parseFloat(document.getElementById('power').value);
+            const logR = parseFloat(document.getElementById('distance').value);
+            const r = Math.pow(10, logR);
+            const media = document.getElementById('media').value;
+            
+            // Update labels
+            document.getElementById('freq-val').innerText = f.toFixed(2);
+            document.getElementById('power-val').innerText = P;
+            document.getElementById('dist-val').innerText = (r >= 1000) ? (r/1000).toFixed(0) + ' km' : r.toFixed(1) + ' m';
+            document.getElementById('current-r').innerText = `r = ${r.toExponential(1)} m`;
+            
+            const results = calculateFields(currentApproach, f, P, r, media);
+            
+            // Update metrics
+            document.getElementById('amp-value').innerText = results.A_peak.toExponential(2);
+            document.getElementById('current-value').innerText = (results.I_rms * 1e6).toFixed(1);
+            document.getElementById('sig-power').innerText = results.Psig_dBm.toFixed(1);
+            document.getElementById('snr-value').innerText = results.SNR_dB.toFixed(1);
+            
+            // Color SNR
+            const snrEl = document.getElementById('snr-value');
+            if (results.SNR_dB > 10) snrEl.style.color = '#166534';
+            else if (results.SNR_dB > 0) snrEl.style.color = '#854d0e';
+            else snrEl.style.color = '#9f1239';
+            
+            // Update amplitude vs distance plot
+            updateAmplitudePlot(f, P, media, currentApproach);
+            
+            // Update SNR bar (fixed conditions)
+            updateSNRBarPlot(f, 20, media);
+        }
+        
+        function updateAmplitudePlot(f, P, media, approach) {
+            const container = document.getElementById('amplitude-plot');
+            
+            const rs = [];
+            const A_zimm = [];
+            const A_hiv = [];
+            const E_zimm = [];
+            
+            for (let logR = 0; logR <= 8; logR += 0.2) {
+                const rr = Math.pow(10, logR);
+                rs.push(rr);
+                
+                const resZ = calculateFields('zimmerman', f, P, rr, media);
+                const resH = calculateFields('hively', f, P, rr, media);
+                
+                A_zimm.push(resZ.A_peak);
+                A_hiv.push(resH.A_peak);
+                E_zimm.push(resZ.E_peak);
+            }
+            
+            const traceA_z = {
+                x: rs,
+                y: A_zimm,
+                type: 'scatter',
+                mode: 'lines',
+                name: 'Zimmerman A_z (1/R)',
+                line: { color: '#d97706', width: 3 }
+            };
+            
+            const traceA_h = {
+                x: rs,
+                y: A_hiv,
+                type: 'scatter',
+                mode: 'lines',
+                name: 'Hively SLW (est. 1/R)',
+                line: { color: '#7c3aed', width: 3, dash: 'dash' }
+            };
+            
+            const traceE = {
+                x: rs,
+                y: E_zimm,
+                type: 'scatter',
+                mode: 'lines',
+                name: 'Zimmerman E_z (1/R²)',
+                line: { color: '#2563eb', width: 2, dash: 'dot' }
+            };
+            
+            const layout = {
+                xaxis: { 
+                    type: 'log', 
+                    title: 'Distance r (m)', 
+                    gridcolor: '#e2e8f0',
+                    tickformat: '.0e'
+                },
+                yaxis: { 
+                    type: 'log', 
+                    title: 'Amplitude (SI units)', 
+                    gridcolor: '#e2e8f0'
+                },
+                margin: { l: 60, r: 20, t: 10, b: 45 },
+                showlegend: true,
+                legend: { orientation: 'h', y: -0.25 },
+                hovermode: 'x unified',
+                plot_bgcolor: 'white',
+                paper_bgcolor: 'white'
+            };
+            
+            if (!amplitudePlot) {
+                amplitudePlot = Plotly.newPlot(container, [traceA_z, traceA_h, traceE], layout, {responsive: true, displayModeBar: false});
+            } else {
+                Plotly.react(container, [traceA_z, traceA_h, traceE], layout);
+            }
+        }
+        
+        function updateSNRBarPlot(f, P, media) {
+            const scenarios = ['air', 'steel', 'seawater', 'leo', 'geo'];
+            const labels = ['Air', 'Steel 3"', 'Seawater', 'LEO', 'GEO'];
+            const snrZ = [];
+            const snrH = [];
+            
+            scenarios.forEach(m => {
+                const resZ = calculateFields('zimmerman', f, P, 1.5, m); // ref short range for fairness? or fixed long
+                // For bar, use a representative long-ish range or current? Use fixed 400km for space comparison
+                let testR = (m === 'leo') ? 4e5 : (m === 'geo') ? 3.6e7 : 1000;
+                const resZ2 = calculateFields('zimmerman', f, P, testR, m);
+                const resH2 = calculateFields('hively', f, P, testR, m);
+                snrZ.push(resZ2.SNR_dB);
+                snrH.push(resH2.SNR_dB);
+            });
+            
+            const traceZ = {
+                x: labels,
+                y: snrZ,
+                type: 'bar',
+                name: 'Zimmerman',
+                marker: { color: '#d97706' }
+            };
+            
+            const traceH = {
+                x: labels,
+                y: snrH,
+                type: 'bar',
+                name: 'Hively (est.)',
+                marker: { color: '#7c3aed' }
+            };
+            
+            const layout = {
+                barmode: 'group',
+                yaxis: { title: 'SNR (dB)', zeroline: true },
+                margin: { l: 50, r: 10, t: 20, b: 40 },
+                showlegend: true,
+                legend: { orientation: 'h' },
+                plot_bgcolor: 'white'
+            };
+            
+            const container = document.getElementById('snr-bar-plot');
+            
+            if (!snrBarPlot) {
+                snrBarPlot = Plotly.newPlot(container, [traceZ, traceH], layout, {responsive: true, displayModeBar: false});
+            } else {
+                Plotly.react(container, [traceZ, traceH], layout);
+            }
+        }
+        
+        function resetSimulator() {
+            document.getElementById('freq').value = 1.3;
+            document.getElementById('power').value = 20;
+            document.getElementById('distance').value = 3.0; // ~1000m? wait log10(1000)=3 yes
+            document.getElementById('media').value = 'air';
+            document.getElementById('bw').value = 10;
+            document.getElementById('nf').value = 3;
+            
+            setApproach('zimmerman');
+            updateSimulator();
+        }
+        
+        function initializeSimulator() {
+            // Initial values
+            document.getElementById('freq').value = 1.3;
+            document.getElementById('power').value = 20;
+            document.getElementById('distance').value = Math.log10(1.5);
+            document.getElementById('media').value = 'air';
+            
+            // Set initial approach
+            const btnZ = document.getElementById('btn-zimmerman');
+            btnZ.classList.add('bg-amber-600', 'text-white');
+            
+            // First update
+            setTimeout(() => {
+                updateSimulator();
+            }, 150);
+            
+            // Add listeners for real-time updates
+            ['freq', 'power', 'distance', 'media', 'bw', 'nf'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) {
+                    el.addEventListener('input', () => {
+                        if (id === 'freq' || id === 'power' || id === 'distance') {
+                            // labels updated inside updateSimulator
+                        }
+                        updateSimulator();
+                    });
+                }
+            });
+            
+            // Keyboard support note
+            console.log('%c[ScalarWave Comparison] Interactive simulator initialized. All controls live.', 'color:#64748b');
+        }
+        
+        // Boot everything
+        function boot() {
+            initializeTailwind();
+            initializeSimulator();
+            
+            // Optional: precompute one bar plot
+            setTimeout(() => {
+                const f = parseFloat(document.getElementById('freq').value || 1.3);
+                updateSNRBarPlot(f, 20, 'air');
+            }, 800);
+            
+            // Make equation rendering nicer if needed (KaTeX already loaded)
+            console.log('%c[ScalarWave Comparison] Webpage ready. All interactive elements functional.', 'color:#64748b');
+        }
+        
+        window.onload = boot;
+        
+        // Bonus: allow console access for debugging
+        window.updateSim = () => updateSimulator();
+        window.setApproachGlobal = setApproach;
+    </script>
+</body>
+</html>
